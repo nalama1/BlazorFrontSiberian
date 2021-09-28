@@ -1,0 +1,106 @@
+﻿@page "/RestauranteForm"
+@page "/RestauranteForm/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+
+<h2 style=" font-weight:bold; color:brown">Formulario Restaurante </h2>
+
+
+<EditForm Model="@oRestaurante">
+    <DataAnnotationsValidator />
+    <div class="container-fluid">
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Nombre:</label>
+            <div class="col-sm-9">
+                <InputText id="txtNombre" class="form-control" @bind-Value="@oRestaurante.NombreRestaurante"></InputText>
+                <ValidationMessage For="(()=> oRestaurante.NombreRestaurante)" />
+            </div>
+        </div>
+
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Idciudad:</label>
+            <div class="col-sm-9">
+                <InputNumber id="txtNombre" class="form-control" @bind-Value="@oRestaurante.Idciudad"></InputNumber>
+                <ValidationMessage For="(()=> oRestaurante.Idciudad)" />
+            </div>
+        </div>
+       
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Número de Aforo:</label>
+            <div class="col-sm-9">
+                <InputNumber id="txtNombre" class="form-control" @bind-Value="@oRestaurante.NumeroAforo"></InputNumber>
+                <ValidationMessage For="(()=> oRestaurante.NumeroAforo)" />
+            </div>
+        </div>
+
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Teléfono:</label>
+            <div class="col-sm-9">
+                <InputNumber id="txtNombre" class="form-control" @bind-Value="@oRestaurante.Telefono"></InputNumber>
+                <ValidationMessage For="(()=> oRestaurante.Telefono)" />
+            </div>
+        </div>
+
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Fecha Creación:</label>
+            <div class="col-sm-9">
+                <InputDate id="dpFecha" class="form-control"
+                           @bind-Value="@oRestaurante.FechaCreacion"
+                           DisplayName="Fecha creación"
+                           ParsingErrorMessage="Debe ser una fecha"></InputDate>
+                <ValidationMessage For="(()=> oRestaurante.FechaCreacion)" />
+            </div>
+        </div>
+
+
+        <div class="form-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="Save">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    Restaurante oRestaurante = new Restaurante();
+    Respuesta<object> oRespuesta = new Respuesta<object>();
+    Respuesta<Restaurante> oRespuestaRestaurante = new Respuesta<Restaurante>();
+    private string Url = "/api/Restaurantes";
+
+    private async Task Save()
+    {
+        if(Id != 0)
+        {
+            var response = await Http.PutAsJsonAsync<Restaurante>(Url, oRestaurante);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        else
+        {
+            var response = await Http.PostAsJsonAsync<Restaurante>(Url, oRestaurante);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+
+        if (oRespuesta.Exito == 1)
+        {
+            Navigation.NavigateTo("/RestauranteIndex");
+        }
+        else
+        {
+        }
+    }
+
+    protected override async Task OnInitializedAsync() {
+        if(Id != 0)
+        {
+            oRespuestaRestaurante = await Http.GetFromJsonAsync<Respuesta<Restaurante>>(Url + "/" + Id);
+            oRestaurante = oRespuestaRestaurante.Data;
+        }
+    }
+
+}
+
+
+

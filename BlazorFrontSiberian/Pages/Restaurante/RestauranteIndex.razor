@@ -1,0 +1,55 @@
+﻿@page "/RestauranteIndex"
+
+@inject HttpClient Http
+
+<h2 style=" font-weight:bold; color:brown">Restaurantes </h2>
+
+<div class="row">
+    <div class="col-12 text-right">
+        <a href="RestauranteForm" class="btn btn-success">Nuevo Restaurante</a>
+    </div>
+</div>
+
+<table class="table table-striped  ">
+
+    <thead>
+        <tr style="background-color:lightblue">
+            <th>Código</th>
+            <th>Nombre Restaurante</th>
+            <th>IDCiudad</th>
+            <th>NumeroAforo</th>
+            <th>Telefono</th>
+            <th>Fecha Creación</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (oRespuesta != null && oRespuesta.Data != null)
+        {
+            @foreach (var item in oRespuesta.Data)
+            {
+                <tr>
+                    <td>@item.Idrestaurante </td>
+                    <td>@item.NombreRestaurante </td>
+                    <td>@item.Idciudad </td>
+                    <td>@item.NumeroAforo </td>
+                    <td>@item.Telefono </td>
+                    <td>@item.FechaCreacion </td>
+                    <td>
+                        <a href="/RestauranteForm/@item.Idrestaurante" class="btn btn-warning">Editar</a>
+                        <a href="/EliminaRestaurante/@item.Idrestaurante" class="btn btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    public string Url = "/api/Restaurantes";
+    public Respuesta<List<Restaurante>> oRespuesta = new Respuesta<List<Restaurante>>();
+
+    protected override async Task OnInitializedAsync() =>
+        oRespuesta = await Http.GetFromJsonAsync<Respuesta<List<Restaurante>>>(Url);
+}

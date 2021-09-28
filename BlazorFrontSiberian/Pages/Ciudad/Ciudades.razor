@@ -1,0 +1,48 @@
+﻿@page "/ciudades"
+
+@inject HttpClient Http
+
+<h2 style=" font-weight:bold; color:brown">Ciudades </h2>
+
+<div class="row">
+    <div class="col-12 text-right" >
+        <a href="CiudadForm" class="btn btn-success">Nueva Ciudad</a>
+    </div>
+</div>
+
+<table class="table table-striped  ">
+
+    <thead>
+        <tr style="background-color:lightblue">
+            <th>Código</th>
+            <th>Ciudad</th>
+            <th>FechaCreación</th>
+            <th></th>           
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (oRespuesta != null && oRespuesta.Data != null)
+        {
+            @foreach (var item in oRespuesta.Data)
+            {
+                <tr>
+                    <td>@item.Idciudad </td>
+                    <td>@item.NombreCiudad </td>
+                    <td>@item.FechaCreacion </td>                    
+                    <td ><a href="/CiudadForm/@item.Idciudad" class="btn btn-warning">Editar</a> 
+                         <a href="/EliminaCiudad/@item.Idciudad" class="btn btn-danger">Eliminar</a>
+                    </td>                    
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    public string Url = "/api/Ciudades";
+    public Respuesta<List<Ciudad>> oRespuesta = new Respuesta<List<Ciudad>>();
+
+    protected override async Task OnInitializedAsync() =>
+        oRespuesta = await Http.GetFromJsonAsync<Respuesta<List<Ciudad>>>(Url);
+}

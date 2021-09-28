@@ -1,0 +1,85 @@
+﻿@page "/CiudadForm"
+@page "/CiudadForm/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+
+
+
+<h2 style=" font-weight:bold; color:brown">Formulario Ciudad </h2>
+
+
+<EditForm Model="@oCiudad">
+    <DataAnnotationsValidator />
+    <div class="container-fluid">
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Nombre:</label>
+            <div class="col-sm-9">
+                <InputText id="txtNombre" class="form-control" @bind-Value="@oCiudad.NombreCiudad"></InputText>
+                <ValidationMessage For="(()=> oCiudad.NombreCiudad)" />
+            </div>
+        </div>
+
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Fecha Creación:</label>
+            <div class="col-sm-9">
+                <InputDate id="dpFecha" class="form-control"
+                           @bind-Value="@oCiudad.FechaCreacion"
+                           DisplayName="Fecha creación"
+                           ParsingErrorMessage="Debe ser una fecha"></InputDate>
+                <ValidationMessage For="(()=> oCiudad.FechaCreacion)" />
+            </div>
+        </div>
+
+
+        <div class="form-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="Save">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    Ciudad oCiudad = new Ciudad();
+    Respuesta<object> oRespuesta = new Respuesta<object>();
+    Respuesta<Ciudad> oRespuestaCiudad = new Respuesta<Ciudad>();
+    private string Url = "/api/Ciudades";
+
+    private async Task Save()
+    {
+        if (Id != 0)
+        {
+            var response = await Http.PutAsJsonAsync<Ciudad>(Url, oCiudad);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        else
+        {
+            var response = await Http.PostAsJsonAsync<Ciudad>(Url, oCiudad);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+
+        if (oRespuesta.Exito == 1)
+        {
+            Navigation.NavigateTo("/ciudades");
+        }
+        else
+        {
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            oRespuestaCiudad = await Http.GetFromJsonAsync<Respuesta<Ciudad>>(Url + "/" + Id);
+            oCiudad = oRespuestaCiudad.Data;
+        }
+    }
+
+}
+
+
+
